@@ -1,0 +1,58 @@
+# CPU 제한 
+- CPU사용량 절대값이 아닌 도커간의 비율로 사용 됨. 기본값 : 1024
+Ex) docker run -ti —c 512 ubuntu:16.04 /bin/bash
+
+# 메모리 제한.
+- 별도의 설정 없을 시 swap 사이즈도 메모리 사이즈와 같다. 
+Ex) docker run -ti —-m 300M ubuntu:16.04 /bin/bash
+    docker run -ti —-m 300M —-memory-swap 1G ubuntu:16.04 /bin/bash	
+
+# 깨끗한 도커 관리를 위한 팁
+1. 실행 중인 모든 컨테이너를 죽인다. 
+- docker kill $(docker ps -q)
+2. 정지된 것을 포함해서, 모든 컨테이너를 삭제한다. 
+- docker rm $(docker ps -a -q)
+3. 오래된 컨테이너를 삭제한다. 
+- docker ps -a |grep ‘week	s ago’| awk ‘{print $1}’ | xarges docker rm
+4. 정지된 컨테이너를 삭제한다. 
+- docker rm -v $(docker ps -a -q -f status=exited)
+5. 불필요한 이미지를 제거한다. 
+- docker rmi $(docker images -q -f dangling=true)
+6. docker olume rm $(docker volume ls -q dangling=ture)
+
+
+# docker 이미지, 파일로 관리하기 : hub를 이용하기 어려운 경우.
+* 이미지
+- 로드
+Ex) docker load < my_image.tar.gz
+- 세이브
+Ex) docker save my_image:my_tag > my_image.tar.gz
+* 컨테이너
+- 임포트
+Ex) cat my_container.tar.gz | docker import - my_image:my_tag
+- 엑스포트
+Ex) docker export my_container > my_container.tar.gz
+* 컨테이너 읽기전용. (Read-only)
+Ex) docker run —read-only
+
+# 모니터링
+- 하나의 컨테이너의 자원 사용량 모니터링 (CPY, memory, network I/O)
+Ex) docker stats <container>
+- 모든 컨테이너의 자원 사용량 모니터링 (컨테이너 ID로 정렬)
+Ex) docker stats $(docker ps -q)
+- 이름 순으로 정렬하여 모니터링 하기 
+Ex) docker stats $(docker ps —format ‘{{.Names}}’)
+- “ubuntu” 이미지로 만들어진 컨테이너 찾기
+Ex) docker ps -a -f ancestor = ubuntu
+
+# 이미지 빌드
+1. docker commit 명령어 -> 간편해보이지만 과정이 어렵고 실수하기 쉬움. 간단한 이미지에만 사용.
+2. Dockerfile docker build 명령어 -> 주로 사용 됨.
+
+
+
+
+
+
+
+
